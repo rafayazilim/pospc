@@ -115,7 +115,7 @@ export default function HomePage({ onNavigate }) {
             İletişim <strong>rafayazilim.com</strong>
           </span>
         </div>
-        <span>RAFA POS PC v1.4.4</span>
+        <span>RAFA POS PC v1.5.0</span>
         <button className="launch-settings" onClick={() => onNavigate("settings")}>
           Ayarlar <Settings size={28} />
         </button>
