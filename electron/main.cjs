@@ -280,7 +280,7 @@ function pushUpdaterStatus(patch) {
 
 function setupAutoUpdater() {
   autoUpdater.autoDownload = false;
-  autoUpdater.autoInstallOnAppQuit = true;
+  autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.forceDevUpdateConfig = isDev;
 
   autoUpdater.on("checking-for-update", () => {
