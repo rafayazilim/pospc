@@ -1,5 +1,5 @@
 import { Bell, Search, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const titles = {
   home: "Ana Ekran",
@@ -17,8 +17,6 @@ const titles = {
 
 export default function Topbar({ currentPage, searchQuery = "", onSearchChange, searchResults = [], onSearchSelect }) {
   const [searchFocused, setSearchFocused] = useState(false);
-  const [updaterStatus, setUpdaterStatus] = useState({ state: "idle" });
-  const [updaterBusy, setUpdaterBusy] = useState(false);
   const date = new Intl.DateTimeFormat("tr-TR", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -30,87 +28,6 @@ export default function Topbar({ currentPage, searchQuery = "", onSearchChange, 
     Masa: searchResults.filter((item) => item.type === "Masa"),
   };
   const sectionOrder = ["Adisyonlar", "Menü", "Masa"];
-
-  useEffect(() => {
-    const updater = window.restaurantUpdater;
-    if (!updater) return undefined;
-
-    let disposed = false;
-    updater.getState?.()
-      .then((status) => {
-        if (!disposed && status) setUpdaterStatus(status);
-      })
-      .catch(() => {});
-    const unsubscribe = updater.onStatus?.((status) => {
-      if (status) setUpdaterStatus(status);
-    });
-
-    return () => {
-      disposed = true;
-      unsubscribe?.();
-    };
-  }, []);
-
-  const installDownloadedUpdate = async (status) => {
-    const shouldInstall = window.confirm(
-      `${status?.version ? `Sürüm ${status.version} indirildi. ` : ""}Güncelleme şimdi yüklenip uygulama yeniden başlatılsın mı?`,
-    );
-    if (!shouldInstall) return;
-    await window.restaurantUpdater.quitAndInstall();
-  };
-
-  const handleUpdaterClick = async () => {
-    const updater = window.restaurantUpdater;
-    if (!updater || updaterBusy) return;
-
-    setUpdaterBusy(true);
-    try {
-      const latestStatus = (await updater.getState?.()) || updaterStatus;
-      if (latestStatus?.state === "downloading" || latestStatus?.state === "checking") {
-        window.alert(latestStatus.message || "Güncelleme işlemi devam ediyor.");
-        return;
-      }
-
-      if (latestStatus?.state === "downloaded") {
-        await installDownloadedUpdate(latestStatus);
-        return;
-      }
-
-      const result = await updater.check();
-      if (result?.ok === false) {
-        window.alert(result.error || "Güncelleme kontrolü başarısız.");
-        return;
-      }
-
-      const checkedStatus = (await updater.getState?.()) || updaterStatus;
-      if (checkedStatus?.state === "downloaded") {
-        await installDownloadedUpdate(checkedStatus);
-        return;
-      }
-
-      if (checkedStatus?.state !== "available") {
-        window.alert(checkedStatus?.message || "Uygulama güncel.");
-        return;
-      }
-
-      const shouldInstall = window.confirm(
-        `${checkedStatus.version ? `Yeni sürüm bulundu: ${checkedStatus.version}. ` : ""}Güncelleme yüklensin mi?`,
-      );
-      if (!shouldInstall) return;
-
-      const downloadResult = await updater.download();
-      if (downloadResult?.ok === false) {
-        window.alert(downloadResult.error || "Güncelleme indirilemedi.");
-        return;
-      }
-
-      await updater.quitAndInstall();
-    } catch (error) {
-      window.alert(error?.message || "Güncelleme işlemi tamamlanamadı.");
-    } finally {
-      setUpdaterBusy(false);
-    }
-  };
 
   return (
     <header className="topbar">
@@ -229,13 +146,7 @@ export default function Topbar({ currentPage, searchQuery = "", onSearchChange, 
       </div>
       <div className="top-actions">
         <span>{date}</span>
-        <button
-          className="icon-button"
-          aria-label="Bildirimler"
-          title={updaterStatus?.message || "Bildirimler"}
-          disabled={updaterBusy}
-          onClick={handleUpdaterClick}
-        >
+        <button className="icon-button" aria-label="Bildirimler">
           <Bell size={20} />
         </button>
         <div className="profile">

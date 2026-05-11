@@ -279,8 +279,8 @@ function pushUpdaterStatus(patch) {
 }
 
 function setupAutoUpdater() {
-  autoUpdater.autoDownload = false;
-  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
   autoUpdater.forceDevUpdateConfig = isDev;
 
   autoUpdater.on("checking-for-update", () => {
@@ -324,6 +324,7 @@ function setupAutoUpdater() {
       version: info?.version,
       message: "Güncelleme indirildi. Uygulamayı yeniden başlatarak kurulabilir.",
     });
+    autoUpdater.quitAndInstall();
   });
 }
 
