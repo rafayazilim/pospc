@@ -1,0 +1,60 @@
+{
+  "name": "restoranpospc",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "electron": "electron .",
+    "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "dist": "npm run build && electron-builder"
+  },
+  "main": "electron/main.cjs",
+  "build": {
+    "appId": "com.gocmenkizininmutfagi.pos",
+    "productName": "Göçmen Kızının Mutfağı POS",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "public/pospcimg.ico",
+        "to": "pospcimg.ico"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "public/pospcimg.ico",
+      "signAndEditExecutable": false
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "fclskn",
+        "repo": "pospc"
+      }
+    ]
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "electron-updater": "^6.8.3",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.8.0",
+    "vite": "^7.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.0",
+    "wait-on": "^8.0.0"
+  }
+}
