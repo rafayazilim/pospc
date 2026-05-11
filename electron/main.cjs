@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const path = require("node:path");
 const os = require("node:os");
@@ -293,6 +293,14 @@ function setupAutoUpdater() {
       version: info?.version,
       message: `Yeni sürüm bulundu: ${info?.version || "-"}`,
     });
+    dialog.showMessageBox(mainWindow, {
+      type: "info",
+      title: "Update Debug",
+      message: "update-available geldi",
+      detail: `Mevcut sürüm: ${app.getVersion()}\nYeni sürüm: ${info?.version || "-"}\nİndirme otomatik başlayacak.`,
+      buttons: ["Tamam"],
+      noLink: true,
+    }).catch(() => {});
   });
 
   autoUpdater.on("update-not-available", (info) => {

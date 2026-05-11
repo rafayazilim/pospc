@@ -11,6 +11,7 @@ const tabs = [
   { value: "restaurant", label: "Restoran Bilgileri" },
   { value: "tables", label: "Masa Düzeni" },
   { value: "printers", label: "Yazıcı Ayarları" },
+  { value: "update-debug", label: "Update Debug" },
   { value: "users", label: "Kullanıcılar" },
   { value: "tax", label: "Vergi" },
   { value: "data", label: "Veri" },
@@ -27,6 +28,9 @@ export default function SettingsPage({ settings, tables = [], onAddTable, onDele
   const [lockPinConfirm, setLockPinConfirm] = useState(settings.lockPin || "");
   const [lockTimeoutMinutes, setLockTimeoutMinutes] = useState(Number(settings.lockTimeoutMinutes) || 30);
   const [lockError, setLockError] = useState("");
+  const [updaterDebugStatus, setUpdaterDebugStatus] = useState(null);
+  const [updaterDebugBusy, setUpdaterDebugBusy] = useState(false);
+  const [updaterDebugLog, setUpdaterDebugLog] = useState([]);
 
   const loadPrinters = async () => {
     if (!window.restaurantPrinter?.list) {
@@ -40,6 +44,23 @@ export default function SettingsPage({ settings, tables = [], onAddTable, onDele
 
   useEffect(() => {
     if (tab === "printers") loadPrinters();
+  }, [tab]);
+
+  useEffect(() => {
+    if (!window.restaurantUpdater?.onStatus) return undefined;
+    const unsubscribe = window.restaurantUpdater.onStatus((status) => {
+      setUpdaterDebugStatus(status);
+      setUpdaterDebugLog((current) => [
+        `${new Date().toLocaleTimeString("tr-TR")} - ${status?.state || "unknown"} - ${status?.message || ""}`,
+        ...current,
+      ].slice(0, 8));
+    });
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (tab !== "update-debug") return;
+    refreshUpdaterDebug();
   }, [tab]);
 
   useEffect(() => {
@@ -94,6 +115,40 @@ export default function SettingsPage({ settings, tables = [], onAddTable, onDele
     } catch (error) {
       onNotify(`Pencereli test başarısız: ${error.message}`);
     }
+  };
+
+  const refreshUpdaterDebug = async () => {
+    if (!window.restaurantUpdater?.getState) {
+      onNotify("Updater debug sadece masaüstü Electron uygulamasında çalışır.");
+      return;
+    }
+    const status = await window.restaurantUpdater.getState();
+    setUpdaterDebugStatus(status);
+  };
+
+  const checkUpdaterDebug = async () => {
+    if (!window.restaurantUpdater?.check) {
+      onNotify("Updater debug sadece masaüstü Electron uygulamasında çalışır.");
+      return;
+    }
+    setUpdaterDebugBusy(true);
+    try {
+      const result = await window.restaurantUpdater.check();
+      await refreshUpdaterDebug();
+      onNotify(result?.ok === false ? `Güncelleme kontrolü başarısız: ${result.error}` : "Güncelleme kontrolü başlatıldı.");
+    } catch (error) {
+      onNotify(`Güncelleme kontrolü başarısız: ${error.message}`);
+    } finally {
+      setUpdaterDebugBusy(false);
+    }
+  };
+
+  const installUpdaterDebug = async () => {
+    if (!window.restaurantUpdater?.quitAndInstall) {
+      onNotify("Updater debug sadece masaüstü Electron uygulamasında çalışır.");
+      return;
+    }
+    await window.restaurantUpdater.quitAndInstall();
   };
 
   const saveLockSettings = () => {
@@ -206,6 +261,37 @@ export default function SettingsPage({ settings, tables = [], onAddTable, onDele
                 <span key={printer.name}>{printer.name}{printer.isDefault ? " · varsayılan" : ""}</span>
               )) : <span>Yazıcı yok veya henüz algılanmadı.</span>}
             </div>
+          </>
+        ) : null}
+        {tab === "update-debug" ? (
+          <>
+            <h2>Update Debug</h2>
+            <div className="rank-list">
+              <div>
+                <strong>State</strong>
+                <em>{updaterDebugStatus?.state || "-"}</em>
+              </div>
+              <div>
+                <strong>Message</strong>
+                <em>{updaterDebugStatus?.message || "-"}</em>
+              </div>
+              <div>
+                <strong>Version</strong>
+                <em>{updaterDebugStatus?.version || "-"}</em>
+              </div>
+              <div>
+                <strong>Progress</strong>
+                <em>{typeof updaterDebugStatus?.progress === "number" ? `%${Math.round(updaterDebugStatus.progress)}` : "-"}</em>
+              </div>
+            </div>
+            <div className="quick-actions">
+              <Button variant="outline" onClick={refreshUpdaterDebug}>Durumu Yenile</Button>
+              <Button variant="primary" disabled={updaterDebugBusy} onClick={checkUpdaterDebug}>Güncelleme Kontrol Et</Button>
+              <Button variant="secondary" onClick={installUpdaterDebug}>quitAndInstall</Button>
+            </div>
+            <pre className="receipt-preview">
+              {updaterDebugLog.length ? updaterDebugLog.join("\n") : "Henüz updater event'i gelmedi."}
+            </pre>
           </>
         ) : null}
         {tab === "users" ? (
