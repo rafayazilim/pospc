@@ -39,7 +39,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "fclskn",
+        "owner": "rafayazilim",
         "repo": "pospc"
       }
     ]
