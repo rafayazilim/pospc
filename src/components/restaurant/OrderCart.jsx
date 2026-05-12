@@ -1,4 +1,4 @@
-﻿import { Minus, Plus, Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import Button from "../ui/Button";
 import Select from "../ui/Select";
 import { Textarea } from "../ui/Input";

@@ -12,10 +12,12 @@ import {
   Settings,
   ShoppingBasket,
   Utensils,
+  WalletCards,
 } from "lucide-react";
 
 const navItems = [
   { id: "home", label: "Ana Ekran", icon: Home },
+  { id: "quickcash", label: "Hızlı Kasa", icon: WalletCards },
   { id: "tables", label: "Masalar", icon: LayoutDashboard },
   { id: "order", label: "Sipariş Oluştur", icon: Utensils },
   { id: "catering", label: "Catering Sipariş", icon: ConciergeBell },

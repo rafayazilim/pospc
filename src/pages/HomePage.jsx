@@ -12,11 +12,13 @@ import {
   Store,
   Table2,
   User,
+  WalletCards,
   Wifi,
   Wrench,
 } from "lucide-react";
 
 const modules = [
+  { id: "quickcash", label: "Hızlı Kasa", icon: WalletCards },
   { id: "tables", label: "Masalar", icon: Table2 },
   { id: "order", label: "Sipariş Oluştur", icon: ReceiptText },
   { id: "payments", label: "Ödemeler", icon: CreditCard },

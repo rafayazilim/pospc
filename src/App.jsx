@@ -18,6 +18,7 @@ import ProductsPage from "./pages/ProductsPage";
 import SettingsPage from "./pages/SettingsPage";
 import CateringOrderPage from "./pages/CateringOrderPage";
 import RetailSalesPage from "./pages/RetailSalesPage";
+import QuickCashPage from "./pages/QuickCashPage";
 import { formatCurrency } from "./utils/format";
 
 export default function App() {
@@ -323,6 +324,17 @@ export default function App() {
         salesRecords={restaurant.salesRecords}
         onCreateSale={restaurant.addRetailSale}
         searchQuery=""
+      />
+    ),
+    quickcash: (
+      <QuickCashPage
+        openBills={restaurant.openBills}
+        products={restaurant.products}
+        onAddProductToBill={restaurant.addProductToTable}
+        onDeleteOrder={restaurant.deleteOrderFromTable}
+        onUpdateOrder={restaurant.updateOrderInTable}
+        onPayment={setPaymentTable}
+        onPrintReceipt={printReceipt}
       />
     ),
     settings: (

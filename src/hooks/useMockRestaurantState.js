@@ -180,6 +180,26 @@ export default function useMockRestaurantState() {
     notify("Ürün masadan silindi");
   };
 
+  const updateOrderInTable = (tableId, orderId, updates) => {
+    setTables((current) =>
+      current.map((table) => {
+        if (table.id !== Number(tableId)) return table;
+        const orders = table.orders.map((order) =>
+          order.id === Number(orderId)
+            ? {
+                ...order,
+                ...updates,
+                quantity: updates.quantity !== undefined ? Math.max(Number(updates.quantity) || 1, 1) : order.quantity,
+                unitPrice: updates.unitPrice !== undefined ? Math.max(Number(updates.unitPrice) || 0, 0) : order.unitPrice,
+              }
+            : order,
+        );
+        return { ...table, orders };
+      }),
+    );
+    notify("Adisyon kalemi güncellendi");
+  };
+
   const addProduct = (product) => {
     setProducts((current) => [{ ...normalizeProduct(product), id: nextId(), price: Number(product.price), isActive: true }, ...current]);
     notify("Ürün kaydedildi");
@@ -390,6 +410,7 @@ export default function useMockRestaurantState() {
     markPaymentWaiting,
     closeTable,
     deleteOrderFromTable,
+    updateOrderInTable,
     addProduct,
     updateProduct,
     deleteProduct,

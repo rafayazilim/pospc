@@ -3,6 +3,7 @@ import { useState } from "react";
 
 const titles = {
   home: "Ana Ekran",
+  quickcash: "Hızlı Kasa",
   tables: "Masalar",
   order: "Sipariş Oluştur",
   catering: "Catering Sipariş",
